@@ -88,6 +88,7 @@ function Footer() {
 
     const { status, colors } = useSelector((state) => state.filters);
     const dispatch = useDispatch();
+
     const onColorChange = (color) => dispatch(colorFilterChanged(color));
     const onStatusChange = (status) => dispatch(statusFilterChanged(status));
     const handleMarkAll = () => dispatch(allCompleted());

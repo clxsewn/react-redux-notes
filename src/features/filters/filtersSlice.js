@@ -30,10 +30,7 @@ const filtersSlice = createSlice({
         },
 
         clearFilters(state, action) {
-            state = {
-                status: StatusFilters.All,
-                colors: [],
-            };
+            return initialState;
         },
     },
 });
