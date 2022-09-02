@@ -1,11 +1,20 @@
 import { client } from '../../api/client';
-import { createSelector, createSlice } from '@reduxjs/toolkit';
+import {
+    createSelector,
+    createSlice,
+    createAsyncThunk,
+} from '@reduxjs/toolkit';
 import { StatusFilters } from '../filters/filtersSlice';
 
 const initialState = {
     status: 'idle', // or: 'loading', 'succeeded', 'failed'
     entities: {},
 };
+
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
+    const response = await client.get('/fakeApi/todos');
+    return response.todos;
+});
 
 const todoSlice = createSlice({
     name: 'todos',
@@ -59,6 +68,25 @@ const todoSlice = createSlice({
             );
         },
     },
+
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchTodos.pending, (state, action) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchTodos.fulfilled, (state, action) => {
+                const newEntities = {};
+                action.payload.forEach((todo) => {
+                    newEntities[todo.id] = todo;
+                });
+                state.entities = newEntities;
+                state.status = 'idle';
+            })
+            .addCase(saveNewTodo.fulfilled, (state, action) => {
+                const todo = action.payload;
+                state.entities[todo.id] = todo;
+            });
+    },
 });
 
 export const {
@@ -74,23 +102,15 @@ export const {
 
 export default todoSlice.reducer;
 
-export const fetchTodos = () => async (dispatch) => {
-    dispatch(todosLoading());
-    const response = await client.get('/fakeApi/todos');
-    dispatch(todosLoaded(response.todos));
-};
-
-export function saveNewTodo(text) {
-    // And then creates and returns the async thunk function:
-    return async function saveNewTodoThunk(dispatch, getState) {
-        // ✅ Now we can use the text value and send it to the server
-        const initialTodo = { text };
+export const saveNewTodo = createAsyncThunk(
+    'todos/saveNewTodo',
+    async (text) => {
         const response = await client.post('/fakeApi/todos', {
-            todo: initialTodo,
+            todo: { text },
         });
-        dispatch(todoAdded(response.todo));
-    };
-}
+        return response.todo;
+    }
+);
 
 const selectTodoEntities = (state) => state.todos.entities;
 
