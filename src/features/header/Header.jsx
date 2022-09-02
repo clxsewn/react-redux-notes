@@ -27,7 +27,7 @@ function Header() {
         <header>
             <input
                 className='new-todo'
-                placeholder='What needs to be done?'
+                placeholder={placeholder}
                 value={text}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}

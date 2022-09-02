@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 export const StatusFilters = {
     All: 'all',
     Active: 'active',
@@ -9,46 +11,34 @@ const initialState = {
     colors: [],
 };
 
-export default function filtersReducer(state = initialState, action) {
-    switch (action.type) {
-        case 'filters/statusFilterChanged': {
-            return {
-                ...state,
-                status: action.payload,
-            };
-        }
+const filtersSlice = createSlice({
+    name: 'filters',
+    initialState,
+    reducers: {
+        statusFilterChanged(state, action) {
+            state.status = action.payload;
+        },
 
-        case 'filters/colorFilterChanged': {
-            return {
-                ...state,
-                colors: state.colors.includes(action.payload)
-                    ? state.colors.filter((color) => color !== action.payload)
-                    : [...state.colors, action.payload],
-            };
-        }
+        colorFilterChanged(state, action) {
+            if (state.colors.includes(action.payload)) {
+                state.colors = state.colors.filter(
+                    (color) => color !== action.payload
+                );
+            } else {
+                state.colors.push(action.payload);
+            }
+        },
 
-        case 'filters/clearFilters': {
-            return {
-                status: 'all',
+        clearFilters(state, action) {
+            state = {
+                status: StatusFilters.All,
                 colors: [],
             };
-        }
+        },
+    },
+});
 
-        default:
-            return state;
-    }
-}
+export const { statusFilterChanged, colorFilterChanged, clearFilters } =
+    filtersSlice.actions;
 
-export const statusFilterChanged = (filter) => {
-    return {
-        type: 'filters/statusFilterChanged',
-        payload: filter,
-    };
-};
-
-export const colorFilterChanged = (color) => {
-    return {
-        type: 'filters/colorFilterChanged',
-        payload: color,
-    };
-};
+export default filtersSlice.reducer;

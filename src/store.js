@@ -1,14 +1,13 @@
-import { configureStore, applyMiddleware } from '@reduxjs/toolkit';
-import rootReducer from './reducer';
-import thunkMiddleware from 'redux-thunk';
-import { reduxThunkMiddleware } from './exampleAddons/middleware';
+import { configureStore } from '@reduxjs/toolkit';
 
-// const composed = applyMiddleware(thunkMiddleware);
-const composed = applyMiddleware(reduxThunkMiddleware);
+import todosSlice from './features/todos/todosSlice';
+import filtersReducer from './features/filters/filtersSlice';
 
 const store = configureStore({
-    reducer: rootReducer,
-    enhancers: [composed],
+    reducer: {
+        todos: todosSlice,
+        filters: filtersReducer,
+    },
 });
 
 export default store;
